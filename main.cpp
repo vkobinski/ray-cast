@@ -93,7 +93,6 @@ public:
 		
 		FillCircle(vPlayer * vCellSize, 4.0f, olc::RED);
 
-		DrawString({10,10}, "Angle: " + std::to_string(fRayAngle));
 		if(fRayAngle >= 360){
 			fRayAngle = 0;
 		}
