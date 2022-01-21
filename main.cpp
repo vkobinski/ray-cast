@@ -38,24 +38,22 @@ private:
 		bool hit = false;
 		float max = 20.0f;
 
-		float fEyeX = sin(ray2);
-		float fEyeY = cos(ray2);
+		float fEyeX = cos(ray2);
+		float fEyeY = sin(ray2);
 
 		while(!hit && step_count < max){
-			step_count += 0.1;
+			step_count += vCellSize.x/10;
 
 			int nTestX = (int)(vRayStart.x + fEyeX * step_count);
 			int nTestY = (int)(vRayStart.y + fEyeY * step_count);
 
-			if(nTestX < 0 || nTestX >= vMapSize.x || nTestY < 0 || nTestY >= vMapSize.y){
-				DrawLine(vRayStart * vCellSize, olc::vi2d(nTestX,nTestY)*vCellSize, olc::YELLOW);
+			int cell = vecMap[nTestY * vMapSize.x + nTestX];
+			if(cell == 1){
+				hit = true;
+			}
+			else if(nTestX > 0 || nTestX <= vMapSize.x || nTestY > 0 || nTestY <= vMapSize.y){	
+				FillRect(olc::vi2d(nTestX, nTestY) * vCellSize, vCellSize, olc::WHITE);
 				continue;
-			}else{
- 				int cell = vecMap[nTestY * vMapSize.x + nTestX];
-				if(cell == 1){
-					DrawLine(vRayStart * vCellSize, olc::vi2d(nTestX,nTestY)*vCellSize, olc::YELLOW);
-					hit = true;
-				}
 			}
 		}
 	}
@@ -75,6 +73,7 @@ public:
 		olc::vi2d vCell = vMouseCell;
 
 		if(GetMouse(olc::Mouse::LEFT).bHeld) vecMap[vCell.y * vMapSize.x + vCell.x] = 1;
+		if(GetMouse(olc::Mouse::RIGHT).bHeld) vecMap[vCell.y * vMapSize.x + vCell.x] = 0;
 
 		if(GetKey(olc::Key::W).bHeld) vPlayer.y -= 25.0f * fElapsedTime;
 		if(GetKey(olc::Key::S).bHeld) vPlayer.y += 25.0f * fElapsedTime;
@@ -82,6 +81,7 @@ public:
 		if(GetKey(olc::Key::D).bHeld) vPlayer.x += 25.0f * fElapsedTime;
 
 		if(GetKey(olc::Key::RIGHT).bHeld) fRayAngle += 10.0f * fElapsedTime;
+		if(GetKey(olc::Key::LEFT).bHeld) fRayAngle -= 10.0f * fElapsedTime;
 
 		olc::vf2d vRayStart = vPlayer;
 
@@ -92,6 +92,7 @@ public:
 		}
 		
 		FillCircle(vPlayer * vCellSize, 4.0f, olc::RED);
+		DrawString({ 20, 20 }, "Angle: " + std::to_string(fRayAngle), olc::WHITE, 2);
 
 		if(fRayAngle >= 360){
 			fRayAngle = 0;
